@@ -1,0 +1,26 @@
+{
+    "packageVcsConf": {},
+    "projectFiles": [
+        "cabal.project"
+    ],
+    "activeProjectKey": {
+        "tag": "CabalTool",
+        "contents": {
+            "pjCabalFile": "cabal.project"
+        }
+    },
+    "saveTime": "Mon Sep  9 17:11:52 +04 2019",
+    "name": "hreg",
+    "activeProjectFile": "cabal.project",
+    "version": 4,
+    "activePackFile": "hreg.cabal",
+    "activeComponent": "exe:hreg",
+    "projectKeys": [
+        {
+            "tag": "CabalTool",
+            "contents": {
+                "pjCabalFile": "cabal.project"
+            }
+        }
+    ]
+}
