@@ -32,9 +32,9 @@ data Value
     | REG_DWORD_BIG_ENDIAN           !Word32
     | REG_LINK                       !Text
     | REG_MULTI_SZ                   !(NonEmpty ByteString)
-    | REG_RESOURCE_LIST              !(NonEmpty ByteString)
-    | REG_FULL_RESOURCE_DESCRIPTION  !(NonEmpty ByteString)
-    | REG_RESOURCE_REQUIREMENTS_LIST !(NonEmpty ByteString)
+    | REG_RESOURCE_LIST              !ByteString
+    | REG_FULL_RESOURCE_DESCRIPTION  !ByteString
+    | REG_RESOURCE_REQUIREMENTS_LIST !ByteString
     | REG_QWORD                      !Word64
     | REG_QWORD_LITTLE_ENDIAN        !Word64
     deriving (Eq, Show)

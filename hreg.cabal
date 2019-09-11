@@ -20,6 +20,7 @@ library
     other-modules:
         HReg.Polfiles
         HReg.Regfiles
+        HReg.Regfiles.Parser
         HReg.Types
         HReg.Types.App
         HReg.Types.Reg
@@ -38,13 +39,15 @@ library
                         MonadFailDesugaring MultiParamTypeClasses MultiWayIf NamedFieldPuns
                         PartialTypeSignatures PatternGuards PolyKinds RankNTypes
                         RecordWildCards ScopedTypeVariables StandaloneDeriving
-                        TupleSections TypeFamilies TypeSynonymInstances ViewPatterns
+                        TypeApplications TupleSections TypeFamilies TypeSynonymInstances ViewPatterns
     ghc-options: -ferror-spans
     build-depends:
+        attoparsec ^>=0.13.2,
         base-noprelude ^>=4.12.0,
         binary -any,
         bytestring -any,
         bytestring-encoding -any,
+        cereal -any,
         co-log -any,
         conduit -any,
         containers -any,

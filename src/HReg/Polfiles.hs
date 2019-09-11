@@ -135,9 +135,9 @@ toVal  4 v = REG_DWORD $ runGet getWord32le (BL.fromStrict v)
 toVal  5 v = REG_DWORD_BIG_ENDIAN $ runGet getWord32be (BL.fromStrict v)
 toVal  6 v = REG_LINK $ decodeUtf16LE v
 toVal  7 v = REG_MULTI_SZ $ fromJust $ nonEmpty $ BS.split zero v
-toVal  8 v = REG_RESOURCE_LIST $ fromJust $ nonEmpty $ BS.split zero v
-toVal  9 v = REG_FULL_RESOURCE_DESCRIPTION $ fromJust $ nonEmpty $ BS.split zero v
-toVal 10 v = REG_RESOURCE_REQUIREMENTS_LIST $ fromJust $ nonEmpty $ BS.split zero v
+toVal  8 v = REG_RESOURCE_LIST v
+toVal  9 v = REG_FULL_RESOURCE_DESCRIPTION v
+toVal 10 v = REG_RESOURCE_REQUIREMENTS_LIST v
 toVal 11 v = REG_QWORD $ runGet getWord64le (BL.fromStrict v)
 
 stripZero :: ByteString -> ByteString

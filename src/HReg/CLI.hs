@@ -171,7 +171,7 @@ modifyFooter :: ParserInfo a -> ParserInfo a
 modifyFooter p = p {infoFooter = stringChunk $ toString artFooter}
 
 artFooter :: Text
-artFooter = " *************************** "
+artFooter = ""
 
 artHeader :: Text
 artHeader = unlines [

@@ -97,9 +97,9 @@ val2file k (REG_DWORD_LITTLE_ENDIAN v)        = (k <.> "dwle", word32LE v)
 val2file k (REG_DWORD_BIG_ENDIAN v)           = (k <.> "dwbe", word32BE v)
 val2file k (REG_LINK v)                       = (k <.> "link", byteString $ encodeUtf8 v)
 val2file k (REG_MULTI_SZ v)                   = (k <.> "msz" , byteString $ BS.intercalate "\0" $ toList v)
-val2file k (REG_RESOURCE_LIST v)              = (k <.> "rl"  , byteString $ BS.intercalate "\0" $ toList v)
-val2file k (REG_FULL_RESOURCE_DESCRIPTION v)  = (k <.> "frd" , byteString $ BS.intercalate "\0" $ toList v)
-val2file k (REG_RESOURCE_REQUIREMENTS_LIST v) = (k <.> "rrq" , byteString $ BS.intercalate "\0" $ toList v)
+val2file k (REG_RESOURCE_LIST v)              = (k <.> "rl"  , byteString v)
+val2file k (REG_FULL_RESOURCE_DESCRIPTION v)  = (k <.> "frd" , byteString v)
+val2file k (REG_RESOURCE_REQUIREMENTS_LIST v) = (k <.> "rrq" , byteString v)
 val2file k (REG_QWORD v)                      = (k <.> "qw"  , word64LE v)
 val2file k (REG_QWORD_LITTLE_ENDIAN v)        = (k <.> "qwle", word64LE v)
 
@@ -118,9 +118,9 @@ readKey fp = do
         ".dwbe" -> REG_DWORD_BIG_ENDIAN $ runGet getWord32be $ BL.fromStrict bs
         ".link" -> REG_LINK $ decodeUtf8 bs
         ".msz"  -> REG_MULTI_SZ $ fromList $ BS.split 0 bs
-        ".rl"   -> REG_RESOURCE_LIST $ fromList $ BS.split 0 bs
-        ".frd"  -> REG_FULL_RESOURCE_DESCRIPTION $ fromList $ BS.split 0 bs
-        ".rrq"  -> REG_RESOURCE_REQUIREMENTS_LIST $ fromList $ BS.split 0 bs
+        ".rl"   -> REG_RESOURCE_LIST bs
+        ".frd"  -> REG_FULL_RESOURCE_DESCRIPTION bs
+        ".rrq"  -> REG_RESOURCE_REQUIREMENTS_LIST bs
         ".qw"   -> REG_QWORD $ runGet getWord64le $ BL.fromStrict bs
         ".qwle" -> REG_QWORD_LITTLE_ENDIAN $ runGet getWord64le $ BL.fromStrict bs
         _       -> REG_NONE bs -- maybe it should fail in case of unknown extension?

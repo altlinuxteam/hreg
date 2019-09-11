@@ -15,12 +15,12 @@
 module HReg.Regfiles (
 --    parseBranch,
     exportReg
+--    readUtf16,
     --
 --    toReg,
 --    showPath,
 --    showKey,
---    Path(..),
---    KeyName(..)
+--    module HReg.Regfiles.Parser
 ) where
 
 import           Data.Binary.Get
@@ -32,6 +32,8 @@ import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Encoding
 import qualified Data.ByteString.Lazy as BL
 import           HReg (readKey)
+import           HReg.Regfiles.Parser
+import           HReg.Regfiles.Types
 import           HReg.Types
 import           System.FilePath
 import           System.FilePath.Find
@@ -40,8 +42,6 @@ import           System.Directory
 import           System.PosixCompat.Files
 import           Prelude hiding (find)
 
-newtype Path = Path FilePath deriving (Eq, Show)
-newtype KeyName = KeyName FilePath deriving (Eq, Show)
 --newtype KeyVal = KeyVal (Text, Value) deriving (Eq, Show)
 
 parseBranch :: FilePath -> FilePath -> IO [(Path, [KeyName])]
@@ -97,8 +97,8 @@ val2reg (REG_DWORD_LITTLE_ENDIAN v)        = "dword:" <> toLazyByteString (word3
 val2reg (REG_DWORD_BIG_ENDIAN v)           = "dwordBE:" <> toLazyByteString (word32BE v)
 val2reg (REG_LINK v)                       = "\"" <> toLazyByteString (byteString $ encodeUtf8 v) <> "\""
 val2reg (REG_MULTI_SZ v)                   = "hex(7):" <> toLazyByteString (byteString $ BS.intercalate "\0" $ toList v)
-val2reg (REG_RESOURCE_LIST v)              = toLazyByteString $ byteString $ BS.intercalate "\0" $ toList v
-val2reg (REG_FULL_RESOURCE_DESCRIPTION v)  = toLazyByteString $ byteString $ BS.intercalate "\0" $ toList v
-val2reg (REG_RESOURCE_REQUIREMENTS_LIST v) = toLazyByteString $ byteString $ BS.intercalate "\0" $ toList v
+val2reg (REG_RESOURCE_LIST v)              = toLazyByteString $ byteString v
+val2reg (REG_FULL_RESOURCE_DESCRIPTION v)  = toLazyByteString $ byteString v
+val2reg (REG_RESOURCE_REQUIREMENTS_LIST v) = toLazyByteString $ byteString v
 val2reg (REG_QWORD v)                      = "qword:" <> toLazyByteString (word64HexFixed v)
 val2reg (REG_QWORD_LITTLE_ENDIAN v)        = "qword:" <> toLazyByteString (word64HexFixed v)
