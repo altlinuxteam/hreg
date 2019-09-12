@@ -13,7 +13,9 @@
 -----------------------------------------------------------------------------
 
 module HReg.Types.Converter (
-    mkVal
+    mkVal,
+    encode,
+    decode
     ) where
 
 import qualified Data.ByteString as BS

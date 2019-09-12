@@ -16,6 +16,7 @@ module HReg (
     runApp,
     hregApply,
     hregExport,
+    hregImport,
     Config(..),
     Scope(..),
     readKey
@@ -34,15 +35,48 @@ import Data.Text.Encoding (decodeUtf16LE, encodeUtf16LE)
 import qualified Data.Text as T
 import HReg.Types
 import HReg.Polfiles (parse, Action(..), Key(..), Value(..))
+import HReg.Regfiles.Parser
+import           HReg.Regfiles.Types
 import System.Directory
 import System.FilePath ((</>), (<.>), takeFileName, takeDirectory, takeExtension)
 
 hregExport :: (HasCallStack, HasPath env, HasLog env, HasPolFiles env) => App env ()
-hregExport = do
+hregExport = undefined {-do
     env <- ask
     let root = getPath env
     processPolFiles
+-}
 
+hregImport :: (HasCallStack, HasPath env, HasLog env, HasRegFiles env) => App env ()
+hregImport = importRegFile
+
+importRegFile :: (HasCallStack, HasLog env, HasRegFiles env, HasPath env) => App env ()
+importRegFile = do
+    env <- ask
+    let root = getPath env
+        regs = getRegFiles env
+    mapM_ (\f -> do
+        logInfo env $ "Parse '" <> T.pack f <> "' file"
+        recs <- liftIO $ parseReg f
+        case recs of
+            Left e -> do
+                logError env $ "failed to parse '" <> T.pack f <> "' as a .reg file"
+                error "regfile parser failed"
+            Right rs -> mapM_ writeRec rs
+        logInfo env "Done"
+        ) regs
+
+writeRec :: (HasCallStack, HasPath env, HasLog env) => RegItem -> App env ()
+writeRec (Path p, keys) = do
+    env <- ask
+    let root = getPath env
+        path = key2path (T.tail . T.init . T.pack $ p)
+    logInfo env $ "create directory for '" <> T.pack path <> "'"
+    liftIO $ createDirectoryPath root path
+    mapM_ (\(KeyName k, v) -> do
+        logInfo env $ "write key '" <> T.pack k <> "'"
+        writeRegKey (root </> path) k v
+        ) keys
 
 hregApply :: (HasCallStack, HasPath env, HasLog env, HasPolFiles env) => App env ()
 hregApply = do
@@ -86,6 +120,29 @@ writeKey p k v = do
     logInfo env $ "Write key '" <> pack k <> "' with '" <> show v <> "' value"
     let (fname, valBS) = val2file k v
     liftIO $ BL.writeFile (p </> fname) (toLazyByteString valBS)
+
+writeRegKey :: (HasCallStack, HasLog env) => FilePath -> FilePath -> Value -> App env ()
+writeRegKey p k v = do
+    env <- ask
+    logInfo env $ "Write reg key '" <> pack k <> "'"
+    let (fname, valBS) = (k <.> (type2ext v), encode v)
+    liftIO $ BL.writeFile (p </> fname) (BL.fromStrict valBS)
+
+type2ext :: Value -> String
+type2ext (REG_NONE _)                       = ""
+type2ext (REG_SZ _)                         = "sz"
+type2ext (REG_EXPAND_SZ _)                  = "esz"
+type2ext (REG_BINARY _)                     = "bin"
+type2ext (REG_DWORD _)                      = "dw"
+type2ext (REG_DWORD_LITTLE_ENDIAN _)        = "dwle"
+type2ext (REG_DWORD_BIG_ENDIAN _)           = "dwbe"
+type2ext (REG_LINK _)                       = "link"
+type2ext (REG_MULTI_SZ _)                   = "msz"
+type2ext (REG_RESOURCE_LIST _)              = "rl"
+type2ext (REG_FULL_RESOURCE_DESCRIPTION _)  = "frd"
+type2ext (REG_RESOURCE_REQUIREMENTS_LIST _) = "rrq"
+type2ext (REG_QWORD _)                      = "qw"
+type2ext (REG_QWORD_LITTLE_ENDIAN _)        = "qwle"
 
 val2file :: FilePath -> Value -> (FilePath, Builder)
 val2file k (REG_NONE v)                       = (k           , byteString v)

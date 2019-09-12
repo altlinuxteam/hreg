@@ -23,6 +23,7 @@ library
         HReg.Regfiles.Parser
         HReg.Types
         HReg.Types.App
+        HReg.Types.Converter
         HReg.Types.Reg
         Paths_hreg
         Prelude

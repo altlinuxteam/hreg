@@ -18,6 +18,7 @@ module HReg.Types.App (
     HasLog(..),
     HasPath(..),
     HasPolFiles(..),
+    HasRegFiles(..),
     App(..),
     runApp
 ) where
@@ -32,6 +33,7 @@ data Scope = Machine
 
 data Config = Config{ dataPath :: FilePath
                     , polFiles :: [(FilePath, Scope)]
+                    , regFiles :: [FilePath]
                     }
     deriving (Eq, Show)
 
@@ -43,18 +45,28 @@ class HasPath a where
 
 class HasLog a where
     logInfo :: (HasCallStack, MonadIO m) => a -> (Text -> m ())
+    logWarning :: (HasCallStack, MonadIO m) => a -> (Text -> m ())
+    logError :: (HasCallStack, MonadIO m) => a -> (Text -> m ())
 
 class HasPolFiles a where
     getPolFiles :: a -> [(FilePath, Scope)]
+
+class HasRegFiles a where
+    getRegFiles :: a -> [FilePath]
 
 instance HasPath Config where
     getPath = dataPath
 
 instance HasLog Config where
     logInfo _a = Log.log callStack Log.Info
+    logWarning _a = Log.log callStack Log.Warning
+    logError _a = Log.log callStack Log.Error
 
 instance HasPolFiles Config where
     getPolFiles = polFiles
+
+instance HasRegFiles Config where
+    getRegFiles = regFiles
 
 runApp :: MonadIO m => env -> App env a -> m a
 runApp env (App (ReaderT f)) = liftIO (f env)

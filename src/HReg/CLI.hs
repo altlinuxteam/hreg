@@ -32,6 +32,8 @@ import qualified Paths_hreg as Meta (version)
 data Command
     -- | @export@ command create .reg file with exported branch
     = Export ExportOpts
+    -- | @import@ command import records from a .reg file and write it to a filesystem
+    | Import ImportOpts
     -- | @apply@ command parse .pol files and modify registry
     | Apply ApplyOpts
     -- | @diff@ command compare two registries and creates resulting .pol file
@@ -41,6 +43,11 @@ data ExportOpts = ExportOpts
     { exportOptsPath    :: FilePath
     , exportOptsOutFile :: FilePath
     , exportOptsRoot    :: FilePath
+    }
+
+data ImportOpts = ImportOpts
+    { importOptsInFile  :: FilePath
+    , importOptsRoot    :: FilePath
     }
 
 data ApplyOpts = ApplyOpts
@@ -71,6 +78,7 @@ hreg version performCommand =
 runCliCommand :: Command -> IO ()
 runCliCommand = \case
     Export opts -> runExport opts
+    Import opts -> runImport opts
     Apply opts -> runApply opts
     Diff opts -> runDiff opts
 
@@ -78,9 +86,14 @@ runExport :: ExportOpts -> IO ()
 runExport exportOpts@ExportOpts{..} = do
     HReg.exportReg exportOptsRoot exportOptsPath exportOptsOutFile
 
+runImport :: ImportOpts -> IO ()
+runImport importOpts@ImportOpts{..} = do
+    let conf = Config importOptsRoot [] [importOptsInFile]
+    HReg.runApp  conf HReg.hregImport
+
 runApply :: ApplyOpts -> IO ()
 runApply applyOpts@ApplyOpts{..} = do
-    let conf = Config applyOptsRoot [(applyOptsInFile, applyOptsScope)]
+    let conf = Config applyOptsRoot [(applyOptsInFile, applyOptsScope)] []
     HReg.runApp conf HReg.hregApply
 
 runDiff :: DiffOpts -> IO ()
@@ -98,6 +111,7 @@ hregVersion = showVersion
 hregP :: Parser Command
 hregP = subparser
      $ command "export" (info (helper <*> exportP) $ progDesc "Export registry branch to the .reg file")
+    <> command "import" (info (helper <*> importP) $ progDesc "import .reg file to the registry")
     <> command "apply"  (info (helper <*> applyP)  $ progDesc "Apply .pol files to the registry")
     <> command "diff"   (info (helper <*> diffP)   $ progDesc "Compare two registry branches and generate .pol file")
 
@@ -107,6 +121,12 @@ exportP = do
     path   <- strArgument (metavar "BRANCH")
     output <- strArgument (metavar "OUTPUT")
     pure $ Export $ ExportOpts path output root
+
+importP :: Parser Command
+importP = do
+    root  <- strArgument (metavar "REG_ROOT")
+    input <- strArgument (metavar "INPUT")
+    pure $ Import $ ImportOpts input root
 
 applyP :: Parser Command
 applyP = do

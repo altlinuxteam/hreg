@@ -29,7 +29,7 @@ import qualified Data.Conduit.Combinators as C
 import qualified Data.ByteString as BS
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
-import           Data.ByteString.Encoding
+import qualified Data.ByteString.Encoding as BS
 import qualified Data.ByteString.Lazy as BL
 import           HReg (readKey)
 import           HReg.Regfiles.Parser
@@ -67,7 +67,7 @@ exportReg root path output = do
 -}
 
 utf8toUtf16 :: ByteString -> ByteString
-utf8toUtf16 = encode utf16le . decode utf8
+utf8toUtf16 = BS.encode BS.utf16le . BS.decode BS.utf8
 
 toReg :: FilePath -> FilePath -> [KeyName] -> IO ByteString
 toReg root p [] = pure $ showPath root p <> "\n\n"

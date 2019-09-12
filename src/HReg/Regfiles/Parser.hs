@@ -12,7 +12,10 @@
 --
 -----------------------------------------------------------------------------
 
-module HReg.Regfiles.Parser where
+module HReg.Regfiles.Parser (
+    parseReg,
+    RegItem(..)
+    ) where
 
 import           Data.Attoparsec.Text.Lazy
 import qualified Data.ByteString as BS
