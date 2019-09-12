@@ -15,7 +15,8 @@
 module HReg.Types.Converter (
     mkVal,
     encode,
-    decode
+    decode,
+    encodeDataOnly
     ) where
 
 import qualified Data.ByteString as BS
@@ -24,6 +25,8 @@ import           Data.Text.Encoding (encodeUtf16LE, decodeUtf16LE)
 import           HReg.Types.Reg
 import           Prelude hiding (get)
 
+encodeDataOnly :: Value -> ByteString
+encodeDataOnly = BS.drop 8 . encode
 
 instance Serialize Value where
     put (REG_NONE                       v) = ty  0 >> regBinary v

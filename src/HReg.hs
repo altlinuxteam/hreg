@@ -125,7 +125,7 @@ writeRegKey :: (HasCallStack, HasLog env) => FilePath -> FilePath -> Value -> Ap
 writeRegKey p k v = do
     env <- ask
     logInfo env $ "Write reg key '" <> pack k <> "'"
-    let (fname, valBS) = (k <.> (type2ext v), encode v)
+    let (fname, valBS) = (k <.> (type2ext v), encodeDataOnly v)
     liftIO $ BL.writeFile (p </> fname) (BL.fromStrict valBS)
 
 type2ext :: Value -> String
