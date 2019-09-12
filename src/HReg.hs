@@ -125,7 +125,7 @@ writeRegKey :: (HasCallStack, HasLog env) => FilePath -> FilePath -> Value -> Ap
 writeRegKey p k v = do
     env <- ask
     logInfo env $ "Write reg key '" <> pack k <> "'"
-    let (fname, valBS) = (k <.> (type2ext v), encodeDataOnly v)
+    let (fname, valBS) = (k <.> (type2ext v), encodeToStore v)
     liftIO $ BL.writeFile (p </> fname) (BL.fromStrict valBS)
 
 type2ext :: Value -> String
@@ -182,8 +182,10 @@ readKey fp = do
         ".qwle" -> REG_QWORD_LITTLE_ENDIAN $ runGet getWord64le $ BL.fromStrict bs
         _       -> REG_NONE bs -- maybe it should fail in case of unknown extension?
 
+{-
 utf16toUtf8 :: ByteString -> ByteString
 utf16toUtf8 = encodeUtf8 . decodeUtf16LE
+-}
 
 key2path :: Key -> FilePath
 key2path k = unpack $ T.map (\c -> if c == '\\' then '/' else c) k

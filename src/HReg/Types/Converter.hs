@@ -16,7 +16,10 @@ module HReg.Types.Converter (
     mkVal,
     encode,
     decode,
-    encodeDataOnly
+    encodeDataOnly,
+    encodeToStore,
+    utf8toUtf16,
+    utf16toUtf8
     ) where
 
 import qualified Data.ByteString as BS
@@ -25,8 +28,22 @@ import           Data.Text.Encoding (encodeUtf16LE, decodeUtf16LE)
 import           HReg.Types.Reg
 import           Prelude hiding (get)
 
+
 encodeDataOnly :: Value -> ByteString
 encodeDataOnly = BS.drop 8 . encode
+
+encodeToStore :: Value -> ByteString
+encodeToStore v@(REG_SZ val) = BS.init . encodeDataOnly $ v
+encodeToStore v@(REG_EXPAND_SZ val) = BS.init . encodeDataOnly $ v
+encodeToStore v@(REG_MULTI_SZ val) = BS.intercalate "\n" . BS.split 0 . BS.init . BS.init . encodeDataOnly $ v
+encodeToStore v@(REG_LINK val) = encodeDataOnly $ v
+encodeToStore v = encodeDataOnly v
+
+utf8toUtf16 :: ByteString -> ByteString
+utf8toUtf16 = encodeUtf16LE . decodeUtf8
+
+utf16toUtf8 :: ByteString -> ByteString
+utf16toUtf8 = encodeUtf8 . decodeUtf16LE
 
 instance Serialize Value where
     put (REG_NONE                       v) = ty  0 >> regBinary v

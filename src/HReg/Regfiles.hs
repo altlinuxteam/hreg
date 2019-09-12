@@ -66,8 +66,10 @@ exportReg root path output = do
         .| sinkFile output
 -}
 
+{-
 utf8toUtf16 :: ByteString -> ByteString
 utf8toUtf16 = BS.encode BS.utf16le . BS.decode BS.utf8
+-}
 
 toReg :: FilePath -> FilePath -> [KeyName] -> IO ByteString
 toReg root p [] = pure $ showPath root p <> "\n\n"
