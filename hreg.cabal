@@ -57,7 +57,7 @@ library
         filemanip -any,
         filepath -any,
         relude ^>=0.5,
-        optparse-applicative -any,
+        optparse-applicative ^>=0.15,
         text -any,
         unix-compat -any
 
