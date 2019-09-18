@@ -1,0 +1,3 @@
+tar: upstream:. name=@name@-@version@
+diff: upstream:. . name=@name@-@version@-@release@.patch
+spec: .gear/hreg.spec
